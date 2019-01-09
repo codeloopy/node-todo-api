@@ -1,33 +1,30 @@
-const mongoose = require("mongoose");
+const express = require("express");
+const bodyParser = require("body-parser");
 
-//setup mongoose to use promises, mongoose by default uses callbacks
-mongoose.Promise = global.Promise;
+const { mongoose } = require("./db/mongoose");
+const { Todo } = require("./models/todo");
+const { User } = require("./models/user");
 
-mongoose.connect("mongodb://localhost:27017/TodoApp");
+const app = express();
 
-const Todo = mongoose.model("Todo", {
-  text: {
-    type: String
-  },
-  completed: {
-    type: Boolean
-  },
-  completedAt: {
-    type: Number
-  }
+// app.use("view-engine", "");
+app.use(bodyParser.json());
+
+app.post("/todos", (req, res) => {
+  let todo = new Todo({
+    text: req.body.text
+  });
+
+  todo.save().then(
+    doc => {
+      res.send(doc);
+    },
+    err => {
+      res.status(400).send(err);
+    }
+  );
 });
 
-const newTodo = new Todo({
-  text: "Make some dinner",
-  type: false,
-  completedAt: new Date()
+app.listen(3000, () => {
+  console.log("Server running on port 3000...");
 });
-
-newTodo.save().then(
-  todo => {
-    console.log("Todo created", todo);
-  },
-  err => {
-    console.log("ERROR - Unable to save", err);
-  }
-);
