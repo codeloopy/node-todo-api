@@ -4,7 +4,9 @@ MongoClient.connect(
   "mongodb://localhost:27017/TodoApp",
   (error, client) => {
     if (error) {
-      return console.log("Unable to connect to MongoDB");
+      return console.log("Unable to connect to MongoDB", {
+        useNewUrlParser: true
+      });
     }
 
     console.log("Connected to MongoDB");
@@ -39,5 +41,6 @@ MongoClient.connect(
     );
 
     client.close();
-  }
+  },
+  { useNewUrlParser: true }
 );

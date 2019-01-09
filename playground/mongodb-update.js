@@ -88,5 +88,6 @@ MongoClient.connect(
     //   );
 
     client.close();
-  }
+  },
+  { useNewUrlParser: true }
 );
