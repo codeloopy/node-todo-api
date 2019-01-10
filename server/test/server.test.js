@@ -72,3 +72,14 @@ describe("GET /todos", () => {
       .end(done);
   });
 });
+
+/*
+decribe("GET /todos/:id", () => {
+  it("should get a todo with an id", done => {
+    request(app)
+      .get("/todos/5c3683a93d595b533373203d")
+      .expect(200)
+      .expect(re);
+  });
+});
+*/
