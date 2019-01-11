@@ -15,8 +15,8 @@ const { User } = require("./../server/models/user");
 //   console.log(todo);
 // });
 
-//Todo.findByIdAndRemve(); //returns the deleted doc
+//Todo.findByIdAndRemove(); //returns the deleted doc - This is depricated use findByIdAndDelete();
 
-Todo.findByIdAndRemove("5c38025f67dfe9bdbbdeacd6").then(todo => {
+Todo.findByIdAndDelete("5c38025f67dfe9bdbbdeacd6").then(todo => {
   console.log(todo);
 });
