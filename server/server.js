@@ -15,6 +15,7 @@ const port = process.env.PORT;
 // app.use("view-engine", "");
 app.use(bodyParser.json());
 
+// CREATE a todo
 app.post("/todos", (req, res) => {
   let todo = new Todo({
     text: req.body.text
@@ -124,6 +125,35 @@ app.patch("/todos/:id", (req, res) => {
     .catch(e => {
       res.status(400).send();
     });
+});
+
+// POST/USERS - Create user
+
+app.post("/users", (req, res) => {
+  const body = _.pick(req.body, ["name", "email", "password"]);
+  const user = new User(body);
+
+  user
+    .save()
+    .then(user => {
+      res.send(user);
+    })
+    .catch(e => {
+      res.status(400).send(e);
+    });
+});
+
+// Get all Users
+
+app.get("/users", (req, res) => {
+  User.find().then(
+    users => {
+      res.send({ users });
+    },
+    e => {
+      res.status(400).send();
+    }
+  );
 });
 
 // Server run
