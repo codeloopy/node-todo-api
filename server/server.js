@@ -8,6 +8,7 @@ const _ = require("lodash");
 const { mongoose } = require("./db/mongoose");
 const { Todo } = require("./models/todo");
 const { User } = require("./models/user");
+const { authenticate } = require("./middleware/authenticate");
 
 const app = express();
 const port = process.env.PORT;
@@ -158,6 +159,16 @@ app.get("/users", (req, res) => {
     }
   );
 });
+
+app.get("/users/me", authenticate, (req, res) => {
+  res.send(req.user);
+});
+
+/* ***************** */
+/*                   */
+/*    SERVER RUN     */
+/*                   */
+/* ***************** */
 
 // Server run
 app.listen(port, () => {

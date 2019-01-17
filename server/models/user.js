@@ -60,6 +60,26 @@ UserSchema.methods.generateAuthToken = function() {
   });
 };
 
+UserSchema.statics.findByToken = function(token) {
+  let User = this;
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, "abc123");
+  } catch (e) {
+    return Promise.reject(); // simplyfied lines 72-73
+    //the arg passed in the reject will be used by the 'e' error handling in server.js
+    // return new Promise((resolve, reject) => {
+    //   reject();
+  }
+
+  return User.findOne({
+    _id: decoded._id,
+    "tokens.token": token,
+    "tokens.access": "auth"
+  });
+};
+
 const User = mongoose.model("Users", UserSchema);
 
 module.exports = { User };
