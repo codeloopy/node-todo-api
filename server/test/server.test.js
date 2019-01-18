@@ -5,6 +5,7 @@ const { ObjectId } = require("mongodb");
 const { app } = require("./../server");
 const { Todo } = require("./../models/todo");
 const { todos, populateTodos, users, populateUsers } = require("./seed/seed");
+const { User } = require("./../models/user");
 
 const newBlankObjID = new ObjectId();
 
@@ -188,5 +189,84 @@ describe("PATCH /todos/:id", () => {
         expect(res.body.todo.text).toBe(newTxt);
       })
       .end(done); //200 back
+  });
+});
+
+describe("GET /users/me", () => {
+  it("should return user if authenticated", done => {
+    request(app)
+      .get("/users/me")
+      .set("x-auth", users[0].tokens[0].token)
+      .expect(200)
+      .expect(res => {
+        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[0].email);
+      })
+      .end(done);
+  });
+
+  it("should return a 401 if not authenticated", done => {
+    request(app)
+      .get("/users/me")
+      .expect(401)
+      .expect(res => {
+        expect(res.body).toEqual({});
+      })
+      .end(done);
+  });
+});
+
+describe("POST /users", () => {
+  it("should create a user", done => {
+    const name = "SomeName";
+    const email = "example@email.com";
+    const password = "123pjm!";
+
+    request(app)
+      .post("/users")
+      .send({ name, email, password })
+      .expect(200)
+      .expect(res => {
+        expect(res.headers["x-auth"]).toBeTruthy(); // toExists is depricated use: toBeTruthy()
+        expect(res.body._id).toBeTruthy();
+        expect(res.body.name).toBe(name);
+        expect(res.body.email).toBe(email);
+      })
+      .end(err => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findOne({ email }).then(user => {
+          expect(user).toBeTruthy();
+          expect(user.password).not.toBe(password);
+          done();
+        });
+      });
+  });
+
+  it("should return validation error if request invalid", done => {
+    // send invalid email and passsword expect a 400
+    const name = "";
+    const email = "emailcom";
+    const password = "pjm";
+
+    request(app)
+      .post("/users")
+      .send({ name, email, password })
+      .expect(400)
+      .end(done);
+  });
+
+  it("should not create user if email is in use", done => {
+    // should fail when there an email already in use or invalid pass, expect 400
+    request(app)
+      .post("/users")
+      .send({
+        email: users[0].email,
+        password: "Password123!"
+      })
+      .expect(400)
+      .end(done);
   });
 });
